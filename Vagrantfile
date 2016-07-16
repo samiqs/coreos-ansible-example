@@ -29,7 +29,7 @@ end
 Vagrant.configure("2") do |config|
   # always use Vagrants insecure key
   config.ssh.insert_key = false
-  
+
   config.vm.box = "coreos-%s" % $update_channel
   config.vm.box_version = ">= 308.0.1"
   config.vm.box_url = "http://%s.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json" % $update_channel
@@ -53,6 +53,10 @@ Vagrant.configure("2") do |config|
   (1..$num_instances).each do |i|
     config.vm.define vm_name = "core-%02d" % i do |config|
       config.vm.hostname = vm_name
+      config.vm.provision "ansible" do |ansible|
+          ansible.playbook = "site.yml"
+          ansible.inventory_path = "inventory/vagrant"
+      end
 
       if $enable_serial_logging
         logdir = File.join(File.dirname(__FILE__), "log")
